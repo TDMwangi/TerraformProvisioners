@@ -21,3 +21,9 @@ data "aws_ami" "ubuntu" {
 
   owners = ["099720109477"]
 }
+
+# Create a self-signed certificate
+resource "tls_private_key" "generated" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
