@@ -63,3 +63,14 @@ resource "aws_security_group" "ingress_ssh" {
     protocol    = "-1"
   }
 }
+
+# Define the VPC
+resource "aws_vpc" "vpc" {
+  cidr_block = var.vpc_cidr
+
+  tags = {
+    Name        = var.vpc_name
+    Environment = "Development"
+    Terraform   = true
+  }
+}
