@@ -118,6 +118,7 @@ resource "aws_route_table" "public_route_table" {
   }
 }
 
+# Create a private route table
 resource "aws_route_table" "private_route_table" {
   vpc_id = aws_vpc.vpc.id
 
@@ -131,4 +132,12 @@ resource "aws_route_table" "private_route_table" {
     Name      = "private_rtb"
     Terraform = true
   }
+}
+
+# Create public route table association
+resource "aws_route_table_association" "public" {
+  depends_on     = [aws_subnet.public_subnets]
+  route_table_id = aws_route_table.public_route_table.id
+  for_each       = aws_subnet.public_subnets
+  subnet_id      = each.value.id
 }
