@@ -149,3 +149,13 @@ resource "aws_route_table_association" "private" {
   for_each       = aws_subnet.private_subnets
   subnet_id      = each.value.id
 }
+
+# Create an internet gateway
+resource "aws_internet_gateway" "internet_gateway" {
+  vpc_id = aws_vpc.vpc.id
+
+  tags = {
+    Name      = "teddy_igw"
+    Terraform = true
+  }
+}
