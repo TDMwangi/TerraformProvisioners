@@ -179,3 +179,31 @@ resource "aws_nat_gateway" "nat_gateway" {
     Name = "teddy_nat_gw"
   }
 }
+
+# Create a security group to allow HTTP and HTTPS access
+resource "aws_security_group" "ingress_http" {
+  name        = "teddy_http"
+  description = "Allow HTTP and HTTPS inbound traffic"
+  vpc_id      = aws_vpc.vpc.id
+
+  ingress {
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+  }
+
+  ingress {
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+  }
+
+  egress {
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+  }
+}
