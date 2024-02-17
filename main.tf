@@ -207,3 +207,41 @@ resource "aws_security_group" "ingress_http" {
     protocol    = "-1"
   }
 }
+
+# Deploy an Ubuntu server
+resource "aws_instance" "ubuntu_server" {
+  ami                         = data.aws_ami.ubuntu.id
+  instance_type               = "t2.micro"
+  subnet_id                   = aws_subnet.public_subnets["public_subnet_1"].id
+  key_name                    = aws_key_pair.generated.key_name
+  security_groups             = [aws_security_group.ingress_ssh.id, aws_security_group.ingress_http.id]
+  associate_public_ip_address = true
+
+  connection {
+    user        = "ubuntu"
+    private_key = tls_private_key.generated.private_key_pem
+    host        = self.public_ip
+  }
+
+  tags = {
+    Name = "Ubuntu EC2 Server"
+  }
+
+  lifecycle {
+    ignore_changes = [security_groups]
+  }
+
+  # Use the local-exec provisioner to change permissions on the local SSH key
+  provisioner "local-exec" {
+    command = "chmod 600 ${local_file.private_key_pem.filename}"
+  }
+
+  # Use the remote-exec provisioner to pull down the web application
+  provisioner "remote-exec" {
+    inline = [
+      "sudo rm -rf /tmp",
+      "sudo git clone https://github.com/hashicorp/demo-terraform-101 /tmp",
+      "sudo sh /tmp/assets/setup-web.sh",
+    ]
+  }
+}
